@@ -11,51 +11,53 @@ import java.util.regex.Pattern;
 
 public class Parse 
 {
-	class LineParser{};
 	private static final String GLOBAL_NEWLINE = "[\\n\\r]";
-	private static final String REGEX = "REGEX_PATTERN";
-	private static final String TARGET_STRING = "TARGET";
+	private static final String[] REGEX_LIST = {"([A-Z])\\w+"};
+	private static final String TARGET_STRING = "a new target String";
+	private static final String OUT_FILE = "result.txt";
 	
 	public Parse()
 	{
 		init();
 	}
-	public Parse(String regex, String target)
+	public Parse(String[] regex, String target)
 	{
 		init(regex, target);
 	}	
-	private void init(){
-		Matcher match = find(REGEX, TARGET_STRING);
-		System.out.println( match.find() );
+	private void init(){	
+		writeToFile(REGEX_LIST, TARGET_STRING);
 	}	
-	private void init(String regex, String target){	
+	private void init(String[] regex, String target){	
 		String ext = target.substring(target.lastIndexOf(".")+1,target.length());
 		if(ext.equals("txt") || ext.endsWith("log")){
 			BufferedReader read;
 			try {
 				read = new BufferedReader(new FileReader(target));
 				String line = null;
-				File out = new File("result.txt");
+				File out = new File(OUT_FILE);
+				FileWriter write = new FileWriter(out, true);
+				write.write("\n**************************************** RESULTS ****************************************\n\n");
+				int lineCount = 0;
 				while((line = read.readLine()) != null){
-					System.out.println(line);
-					if(isCandidate(regex, line)){
-						System.out.println("match");
-						Matcher match = find(regex, line);
-						try {
-							FileWriter write = new FileWriter(out, true);
+					lineCount++;
+					//System.out.println(line);
+					for(int i = 0; i<regex.length;i++)
+					{
+						if(isCandidate(regex[i], line))
+						{
+							Matcher match = find(regex[i], line);
 							int counter = 0;
-							while(match.find()){	
+							while(match.find())
+							{		
 								counter++;
-								System.out.println(match.group());
-								write.write("Match " + counter + " :" + match.group() + "\n");
+								//System.out.println(match.group());
+								write.write("Match # " + counter + " found on line " + lineCount + " = " + match.group() + "\n");
 							}
-							write.close();
-						} catch (IOException e) {
-							e.printStackTrace();
-							System.out.println("Could not create file writer");
-						}			
+						}
 					}
 				}
+				write.write("\n****************************************   END   ****************************************\n");
+				write.close();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 				System.out.println("File not found");
@@ -65,26 +67,34 @@ public class Parse
 			}	
 		}
 		else
-		{
-			if(isCandidate(regex, target))
-			{ 
-				Matcher match = find(regex, target);
-				File out = new File("result.txt");
-				try {
-					FileWriter write = new FileWriter(out);
-					int counter = 0;
-					while(match.find()){	
-						counter++;
-						System.out.println(match.group());
-						write.write("Match " + counter + " :" + match.group() + "\n");
-					}
-					write.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-					System.out.println("Could not create file writer");
-				}		
-			}
+		{	
+			writeToFile(regex, target);
 		}
+	}
+	public void writeToFile(String[] regex, String target){
+		try {
+			File out = new File(OUT_FILE);
+			FileWriter write = new FileWriter(out, true);
+			write.write("\n**************************************** RESULTS ****************************************\n\n");
+			for(int i = 0; i<regex.length;i++)
+			{
+				if(isCandidate(regex[i], target))
+				{
+					Matcher match = find(regex[i], target);
+					int counter = 0;
+					while(match.find())
+					{		
+						counter++;
+						//System.out.println(match.group());
+						write.write("Match # " + counter + " found = " + match.group() + "\n");	
+					}
+				}
+			}
+			write.write("\n****************************************   END   ****************************************\n");
+			write.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}		
 	}
 	static Matcher find(String regex, String target)
 	{
@@ -114,6 +124,11 @@ public class Parse
 		Matcher match = find(regex, target);
 		candidate = match.find() ? true : false;
 		return candidate;
-	}	
+	}
+	public static void main(String[] args){
+		Parse test = new Parse();
+		Parse text2 = new Parse(REGEX_LIST, TARGET_STRING);
+		Parse text3 = new Parse();
+	}
 }
 
