@@ -9,12 +9,15 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
+
 public class Parse 
 {
 	private static final String GLOBAL_NEWLINE = "[\\n\\r]";
 	private static final String[] REGEX_LIST = {"([A-Z])\\w+"};
 	private static final String TARGET_STRING = "a new target String";
 	private static final String OUT_FILE = "result.txt";
+	static Logger log = Logger.getLogger(Parse.class.getName());
 	
 	public Parse()
 	{
@@ -40,7 +43,6 @@ public class Parse
 				int lineCount = 0;
 				while((line = read.readLine()) != null){
 					lineCount++;
-					//System.out.println(line);
 					for(int i = 0; i<regex.length;i++)
 					{
 						if(isCandidate(regex[i], line))
@@ -50,7 +52,6 @@ public class Parse
 							while(match.find())
 							{		
 								counter++;
-								//System.out.println(match.group());
 								write.write("Match # " + counter + " found on line " + lineCount + " = " + match.group() + "\n");
 							}
 						}
@@ -61,9 +62,13 @@ public class Parse
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 				System.out.println("File not found");
+				log.error(e);
+				log.debug(e);
 			} catch (IOException e) {
 				e.printStackTrace();
 				System.out.println("No line to read");
+				log.error(e);
+				log.debug(e);
 			}	
 		}
 		else
@@ -85,7 +90,6 @@ public class Parse
 					while(match.find())
 					{		
 						counter++;
-						//System.out.println(match.group());
 						write.write("Match # " + counter + " found = " + match.group() + "\n");	
 					}
 				}
