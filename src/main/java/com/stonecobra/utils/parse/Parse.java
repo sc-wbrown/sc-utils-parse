@@ -60,15 +60,9 @@ public class Parse
 				write.write("\n****************************************   END   ****************************************\n");
 				write.close();
 			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-				System.out.println("File not found");
 				log.error(e);
-				log.debug(e);
 			} catch (IOException e) {
-				e.printStackTrace();
-				System.out.println("No line to read");
 				log.error(e);
-				log.debug(e);
 			}	
 		}
 		else
@@ -97,7 +91,7 @@ public class Parse
 			write.write("\n****************************************   END   ****************************************\n");
 			write.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error(e);
 		}		
 	}
 	static Matcher find(String regex, String target)
